@@ -1,2 +1,6 @@
-### Project: Scooter Share Trips Prediction in Chicago City
-### Author: Ziyi Yang
+### CPLN 680/ Capstone Project:
+#### Predicting Scooter Share Trips in Chicago City
+---
+### Author: 
+#### Ziyi Yang
+---
