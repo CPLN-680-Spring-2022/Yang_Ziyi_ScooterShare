@@ -1,1 +1,2 @@
-Yang_Ziyi_ScooterShare
+### Project: Scooter Share Demand Prediction
+### Author: Ziyi Yang
