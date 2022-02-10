@@ -23,6 +23,8 @@ palette2 <- c("#6baed6","#08519c")
 
 Chiride <- read.csv("C:/Users/y4ngz/Desktop/E-Scooter_Trips_-_2020.csv")
 
+ChiNei <- read.csv("C:/Users/y4ngz/Desktop/A/yang_ziyi_scootershare/raw_data/E-Scooter_Trips_-_Census_Tract_Summary_-_2020.csv")
+
 Chiride2 <-
   Chiride %>% 
   mutate(interval60 = floor_date(mdy_hms(Start.Time), unit = "hour"),
@@ -115,3 +117,14 @@ grid.arrange(top = "Weather Data - Chicago",
                    labs(title="Wind Speed", x="Hour", y="Wind Speed") + plotTheme(),
                  ggplot(weather.Panel, aes(interval60,Temperature)) + geom_line() + 
                    labs(title="Temperature", x="Hour", y="Temperature") + plotTheme())
+
+
+
+
+counts <- table(ChiNei$Trip.Count)
+barplot(counts, main="Trip Distribution",
+        xlab="Number of Trip")
+
+company <- table(Chiride$Vendor)
+barplot(company, main ="Differences in the number of people travelling",
+        xlab="Company Name", col="#6baed6")
