@@ -25,10 +25,19 @@ Chiride <- read.csv("C:/Users/y4ngz/Desktop/E-Scooter_Trips_-_2020.csv")
 
 ChiNei <- read.csv("C:/Users/y4ngz/Desktop/A/yang_ziyi_scootershare/raw_data/E-Scooter_Trips_-_Census_Tract_Summary_-_2020.csv")
 
+CH_clean <- Chiride[!is.na(Chiride$`Start.Centroid.Location`),]
+CH_clean <- CH_clean[!is.na(CH_clean$`End.Centroid.Location`),]
+CH_clean$`Start.Time` <- as.POSIXct(CH_clean$`Start.Time`, format='%m/%d/%Y %I:%M:%S %p')
+CH_clean$`End.Time` <- as.POSIXct(CH_clean$`End.Time`, format='%m/%d/%Y %I:%M:%S %p')
+
+CH_09 <- CH_clean %>%
+  filter(month(`Start.Time`) == 9)
+write.csv(CH_09, "trip09.csv")
+
 Chiride2 <-
-  Chiride %>% 
-  mutate(interval60 = floor_date(mdy_hms(Start.Time), unit = "hour"),
-         interval15 = floor_date(mdy_hms(End.Time), unit = "15 mins"),
+  CH_09 %>% 
+  mutate(interval60 = floor_date(ymd_hms(Start.Time), unit = "hour"),
+         interval15 = floor_date(ymd_hms(End.Time), unit = "15 mins"),
          week = week(interval60),
          dotw = wday(interval60, label=TRUE))
 
@@ -128,3 +137,5 @@ barplot(counts, main="Trip Distribution",
 company <- table(Chiride$Vendor)
 barplot(company, main ="Differences in the number of people travelling",
         xlab="Company Name", col="#6baed6")
+
+
