@@ -80,6 +80,30 @@ qBr <- function(df, variable, rnd) {
 
 q5 <- function(variable) {as.factor(ntile(variable, 5))}
 
+#### KNN ####
+# nn function ####
+nn_function <- function(measureFrom,measureTo,k) {
+  measureFrom_Matrix <-
+    as.matrix(measureFrom)
+  measureTo_Matrix <-
+    as.matrix(measureTo)
+  nn <-   
+    get.knnx(measureTo, measureFrom, k)$nn.dist
+  output <-
+    as.data.frame(nn) %>%
+    rownames_to_column(var = "thisPoint") %>%
+    gather(points, point_distance, V1:ncol(.)) %>%
+    arrange(as.numeric(thisPoint)) %>%
+    group_by(thisPoint) %>%
+    summarize(pointDistance = mean(point_distance)) %>%
+    arrange(as.numeric(thisPoint)) %>% 
+    dplyr::select(-thisPoint) %>%
+    pull()
+  
+  return(output)  
+}
+
+
 CH_proj <- 3529
 
 CH_scooter_raw <- read.csv("C:/Users/y4ngz/Desktop/E-Scooter_Trips_-_2020.csv")
@@ -219,3 +243,15 @@ CH_Census_ct <- merge(CH_ct, CH_Census_ct, by.x = 'geoid10', by.y = 'GEOID')
 
 CH_Census_ct <- CH_Census_ct %>%
   dplyr::select(-c(commarea, commarea_n, countyfp10, name10, namelsad10, notes, statefp10))
+
+CH_scooter_sf <- CH_scooter_clean_ori %>% st_as_sf(coords = c('Start.Centroid.Longitude','Start.Centroid.Latitude'),crs=4326) %>%
+  st_transform(CH_proj) %>%
+  mutate(Start.Centroid.Longitude = unlist(map(geometry, 1)),
+         Start.Centroid.Latitude = unlist(map(geometry, 2)))
+CH_scooter_ct <- st_join(CH_scooter_sf %>% st_transform(3529), CH_Census_geoinfo %>% dplyr::select(GEOID), st_within, left=T)
+  # %>% rename(Start.Census.Tract=GEOID)
+
+CH_scooter_ct <- 
+  left_join(CH_scooter_ct,spatial_panel %>%
+              as.data.frame() %>%
+              dplyr::select(-geometry), by = c("GEOID" = "geoid10"))
