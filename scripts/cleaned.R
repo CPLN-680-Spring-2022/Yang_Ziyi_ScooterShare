@@ -249,7 +249,6 @@ CH_scooter_sf <- CH_scooter_clean_ori %>% st_as_sf(coords = c('Start.Centroid.Lo
   mutate(Start.Centroid.Longitude = unlist(map(geometry, 1)),
          Start.Centroid.Latitude = unlist(map(geometry, 2)))
 CH_scooter_ct <- st_join(CH_scooter_sf %>% st_transform(3529), CH_Census_geoinfo %>% dplyr::select(GEOID), st_within, left=T)
-  # %>% rename(Start.Census.Tract=GEOID)
 
 CH_scooter_ct <- 
   left_join(CH_scooter_ct,spatial_panel %>%

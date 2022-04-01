@@ -1,7 +1,8 @@
+#library(ggcorrplot)
+
 numericVars <- 
-  select_if(st_drop_geometry(CH_scooter_ct), is.numeric) %>% 
-  dplyr::select(-End.Centroid.Latitude,-End.Centroid.Longitude,-Start.Centroid.Longitude,-Start.Centroid.Latitude,
-                -centroid_Y,-centroid_X,-KNN_college,-KNN_restaurant,-KNN_public_transport,-KNN_office,
+  select_if(st_drop_geometry(CH_spatial_census), is.numeric) %>% 
+  dplyr::select(-centroid_Y,-centroid_X,-KNN_college,-KNN_restaurant,-KNN_public_transport,-KNN_office,
                 -KNN_retail,-KNN_tourism,-KNN_leisure,-count_retail,-count_office,-count_leisure,-count_tourism,-count_pubtran,-count_restaurant,-count_college)%>% na.omit()
 
 ggcorrplot(

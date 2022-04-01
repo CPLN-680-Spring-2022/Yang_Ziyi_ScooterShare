@@ -84,24 +84,28 @@ retail_ct <- st_join(census_geoinfo %>% st_intersection(boundary), retail) %>%
   group_by(geoid10,area) %>%
   summarise(count_retail= n())
 retail_ct$density_retail <- retail_ct$count_retail/retail_ct$area
+retail_ct$ratio_retail <- retail_ct$count_retail/12702
 
 # office 
 office_ct <- st_join(census_geoinfo %>% st_intersection(boundary), office) %>%
   group_by(geoid10,area) %>%
   summarise(count_office= n())
 office_ct$density_office <- office_ct$count_office/office_ct$area
+office_ct$ratio_office <- office_ct$count_office/1828
 
 # restaurant 
 restaurant_ct <- st_join(census_geoinfo %>% st_intersection(boundary),restaurant) %>%
   group_by(geoid10,area) %>%
   summarise(count_restaurant= n())
 restaurant_ct$density_restaurant <- restaurant_ct$count_restaurant/restaurant_ct$area
+restaurant_ct$ratio_restaurant <- restaurant_ct$count_restaurant/7617
 
 # public transport
 public_transport_ct <- st_join(census_geoinfo %>% st_intersection(boundary),public_transport) %>%
   group_by(geoid10,area) %>%
   summarise(count_pubtran= n())
 public_transport_ct$density_pubtran <- public_transport_ct$count_pubtran/public_transport_ct$area
+public_transport_ct$ratio_pubtran <- public_transport_ct$count_pubtran/6064
 
 # cycleway
 cycleway_ct_len <- st_intersection(cycleway, boundary) %>%
@@ -111,33 +115,42 @@ cycleway_ct_len <- st_intersection(cycleway, boundary) %>%
   st_set_geometry(NULL) %>%
   merge(census_geoinfo, on='geoid10', all.y=T) %>%
   st_as_sf()
-cycleway_ct_len$total_length <- replace_na(cycleway_ct_len$total_length,0) 
+cycleway_ct_len$total_length <- replace_na(cycleway_ct_len$total_length,0)
+cycleway_ct_len$ratio_cycleway <- cycleway_ct_len$total_length/3434
 
 # leisure
 leisure_ct <- st_join(census_geoinfo %>% st_intersection(boundary), leisure) %>%
   group_by(geoid10,area) %>%
   summarise(count_leisure= n())
 leisure_ct$density_leisure <- leisure_ct$count_leisure/leisure_ct$area
+leisure_ct$ratio_leisure <- leisure_ct$count_leisure/30944
 
 # tourism
 tourism_ct <- st_join(census_geoinfo %>% st_intersection(boundary), tourism) %>%
   group_by(geoid10,area) %>%
   summarise(count_tourism= n())
 tourism_ct$density_tourism <- tourism_ct$count_tourism/tourism_ct$area
+tourism_ct$ratio_tourism <- tourism_ct$count_tourism/2203
+
 
 # college
 college_ct <- st_join(census_geoinfo %>% st_intersection(boundary), college) %>%
   group_by(geoid10,area) %>%
   summarise(count_college= n())
 college_ct$density_college <- college_ct$count_college/college_ct$area
+college_ct$ratio_college <- college_ct$count_college/77
 
-spatial_panel <- left_join(census_panel, retail_ct%>%st_set_geometry(NULL)%>%dplyr::select(geoid10, count_retail, density_retail), by = 'geoid10') %>%
-  left_join(office_ct %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, count_office, density_office), by = 'geoid10') %>%
-  left_join(leisure_ct %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, count_leisure, density_leisure), by = 'geoid10') %>%
-  left_join(tourism_ct %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, count_tourism, density_tourism), by = 'geoid10') %>%
-  left_join(public_transport_ct %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, count_pubtran,density_pubtran), by = 'geoid10') %>%
-  left_join(restaurant_ct %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, count_restaurant, density_restaurant), by = 'geoid10') %>%
-  left_join(college_ct %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, count_college, density_college), by = 'geoid10') %>%
-  left_join(cycleway_ct_len %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, total_length), by = 'geoid10')
+spatial_panel <- left_join(census_panel, retail_ct%>%st_set_geometry(NULL)%>%dplyr::select(geoid10, count_retail, density_retail,ratio_retail), by = 'geoid10') %>%
+  left_join(office_ct %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, count_office, density_office,ratio_office), by = 'geoid10') %>%
+  left_join(leisure_ct %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, count_leisure, density_leisure,ratio_leisure), by = 'geoid10') %>%
+  left_join(tourism_ct %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, count_tourism, density_tourism,ratio_tourism), by = 'geoid10') %>%
+  left_join(public_transport_ct %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, count_pubtran,density_pubtran,ratio_pubtran), by = 'geoid10') %>%
+  left_join(restaurant_ct %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, count_restaurant, density_restaurant,ratio_restaurant), by = 'geoid10') %>%
+  left_join(college_ct %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, count_college, density_college,ratio_college), by = 'geoid10') %>%
+  left_join(cycleway_ct_len %>% st_set_geometry(NULL) %>% dplyr::select(geoid10, total_length,ratio_cycleway), by = 'geoid10')
 
 spatial_panel[is.na(spatial_panel)] <- 0
+
+CH_spatial_census <- left_join(spatial_panel, CH_open_ct%>%st_set_geometry(NULL)%>%dplyr::select(origins_cnt, geoid10), by = 'geoid10')
+
+
