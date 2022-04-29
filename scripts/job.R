@@ -24,7 +24,7 @@ soc_correlation.long <-
   gather(Variable, Value, -origins_cnt )
 
 soc_correlation.cor <-
-  job_correlation.long %>%
+  soc_correlation.long %>%
   group_by(Variable) %>%
   summarize(correlation = cor(Value, origins_cnt, use = "complete.obs"))
 
@@ -33,6 +33,6 @@ ggplot(soc_correlation.long, aes(Value, origins_cnt)) +
   geom_text(data = soc_correlation.cor, aes(label = paste("r =", round(correlation, 2))),
             x=-Inf, y=Inf, vjust = 1, hjust = -.1) +
   geom_smooth(method = "lm", se = FALSE, colour = "gold") +
-  facet_wrap(~Variable, ncol = 5, scales = "free") +
-  labs(title = "Origin count as a function of spatial factors")
+  facet_wrap(~Variable, ncol = 4, scales = "free") +
+  labs(title = "Socio-economic factors")
 

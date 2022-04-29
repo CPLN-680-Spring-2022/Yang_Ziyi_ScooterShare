@@ -1,9 +1,7 @@
 #library(ggcorrplot)
 
 numericVars <- 
-  select_if(st_drop_geometry(CH_spatial_census), is.numeric) %>% 
-  dplyr::select(-centroid_Y,-centroid_X,-KNN_college,-KNN_restaurant,-KNN_public_transport,-KNN_office,
-                -KNN_retail,-KNN_tourism,-KNN_leisure,-count_retail,-count_office,-count_leisure,-count_tourism,-count_pubtran,-count_restaurant,-count_college)%>% na.omit()
+  select_if(st_drop_geometry(Model_clean), is.numeric)%>% na.omit()
 
 ggcorrplot(
   round(cor(numericVars), 1), 

@@ -238,7 +238,7 @@ CH_Census_ct <- CH_Census %>%
   filter(CH_Census$GEOID %in% CH_tract_list) %>%
   st_set_geometry(NULL)
 
-# rejoin geometry infor from ct_LV
+# rejoin geometry infor from ct_CH
 CH_Census_ct <- merge(CH_ct, CH_Census_ct, by.x = 'geoid10', by.y = 'GEOID')
 
 CH_Census_ct <- CH_Census_ct %>%

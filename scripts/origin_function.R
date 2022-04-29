@@ -1,7 +1,7 @@
 # Count dests for each census tract
-make_CH_open_sf <- function(x, # x should be 'LV_open_raw'
+make_CH_open_sf <- function(x,
                             trip_start, # define whether you want the origins or the destinations
-                            proj) { # proj should be 'LV_proj'
+                            proj) { 
   
   if(!grepl("ori|des", trip_start)) {
     
@@ -11,6 +11,7 @@ make_CH_open_sf <- function(x, # x should be 'LV_open_raw'
     
     output <- x %>%
       dplyr::select(Trip.ID,
+                    Start.Community.Area.Number,
                     Start.Centroid.Latitude,   
                     Start.Centroid.Longitude,
                     Start.Time) %>% 
@@ -22,9 +23,10 @@ make_CH_open_sf <- function(x, # x should be 'LV_open_raw'
     
     output <- x %>%
       dplyr::select(Trip.ID,
+                    End.Community.Area.Number,
                     End.Centroid.Latitude,   
                     End.Centroid.Longitude, 
-                    Start.Time) %>% 
+                    End.Time) %>% 
       st_as_sf(coords = c("End.Centroid.Longitude", "End.Centroid.Latitude"), 
                crs = 4326) %>% 
       st_transform(proj)
@@ -34,8 +36,7 @@ make_CH_open_sf <- function(x, # x should be 'LV_open_raw'
 }
 CH_proj=3529
 
-CH_open_09_sf <- CH_open_origins %>%
-  filter(month(Start.Time) >= '2020-09-01' & Start.Time < '2020-10-01')
+CH_open_all_sf <- CH_open_origins
 
 CH_open_origins <- make_CH_open_sf(CH_scooter_clean,
                                    trip_start = "origins",
@@ -50,10 +51,10 @@ CH_open_dests <- make_CH_open_sf(CH_scooter_clean,
 
 
 CH_open_origins_ct <- CH_Census_ct %>% 
-  mutate(origins_cnt = (lengths(st_intersects(., CH_open_09_sf))))
+  mutate(origins_cnt = (lengths(st_intersects(., CH_open_all_sf))))
 
 CH_open_dests_ct <- CH_Census_ct %>%
-  mutate(dests_cnt = lengths(st_intersects(., CH_open_dests)))
+  mutate(dests_cnt = lengths(st_intersects(., CH_open_all_sf)))
 
 # Combine
 CH_open_ct <- CH_open_origins_ct %>%
@@ -63,7 +64,7 @@ CH_open_ct <- CH_open_origins_ct %>%
             by = "geoid10")
 
 CH_open_ct <- CH_open_origins_ct
-
+CH_open_ct <-na.omit(CH_open_ct) 
 #
 CH_ORIGINS <- CH_scooter_ct %>%
   group_by(Start.Community.Area.Number) %>% 
@@ -81,9 +82,10 @@ spatial_correlation.long <-
   dplyr::select(origins_cnt, KNN_college, KNN_restaurant, KNN_public_transport, 
                 KNN_retail, KNN_office, KNN_tourism, KNN_leisure, count_retail, 
                 density_retail, count_office, density_office, count_leisure,
-                density_leisure, count_tourism, density_tourism,count_pubtran,
+                density_leisure, count_tourism, total_length, density_tourism,count_pubtran,
                 density_pubtran, count_restaurant, density_restaurant,
-                count_college, density_college, total_length) %>%
+                count_college, density_college,ratio_college, ratio_restaurant, ratio_pubtran, 
+                ratio_retail, ratio_office, ratio_tourism, ratio_leisure, ) %>%
   gather(Variable, Value, -origins_cnt )
 
 spatial_correlation.cor <-
@@ -97,7 +99,7 @@ ggplot(spatial_correlation.long, aes(Value, origins_cnt)) +
             x=-Inf, y=Inf, vjust = 1, hjust = -.1) +
   geom_smooth(method = "lm", se = FALSE, colour = "gold") +
   facet_wrap(~Variable, ncol = 5, scales = "free") +
-  labs(title = "Origin count as a function of spatial factors")
+  labs(title = "Spatial factors")
 
 
 
@@ -120,5 +122,8 @@ ggplot(demo_correlation.long, aes(Value, origins_cnt)) +
             x=-Inf, y=Inf, vjust = 1, hjust = -.1) +
   geom_smooth(method = "lm", se = FALSE, colour = "gold") +
   facet_wrap(~Variable, ncol = 5, scales = "free") +
-  labs(title = "Origin count as a function of spatial factors")
+  labs(title = "Demographic factors")
 
+
+#ggplot(data=spatial_correlation.long) + 
+#  geom_boxplot(aes(x=Variable, y=Value)) 

@@ -1,5 +1,9 @@
 q0 <- opq(bbox = c(-88.30,42.20,-87.60,41.50)) 
-
+city_name = "Chicago"
+CH_proj <- 3529
+proj = CH_proj
+boundary = CH_Census_ct
+census_geoinfo = CH_Census_ct 
 college1 <- add_osm_feature(opq = q0, key = 'amenity', value = c("university", "college")) %>%
   osmdata_sf(.)
 
